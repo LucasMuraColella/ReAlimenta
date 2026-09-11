@@ -1,0 +1,975 @@
+package view;
+
+import dao.AlimentoDAO;
+import dao.CategoriaDAO;
+import dao.DoadorDAO;
+
+import model.Alimento;
+import model.Categoria;
+import model.Doador;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+public class TelaAlimento extends javax.swing.JFrame {
+
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(TelaAlimento.class.getName());
+
+    private AlimentoDAO alimentoDAO = new AlimentoDAO();
+    private CategoriaDAO categoriaDAO = new CategoriaDAO();
+    private DoadorDAO doadorDAO = new DoadorDAO();
+
+    private int id_alimento_selecionado = 0;
+
+    private final DateTimeFormatter formato_data
+            = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    public TelaAlimento() {
+        initComponents();
+        cbStatus.setEnabled(false);
+        setLocationRelativeTo(null);
+
+        carregarCategorias();
+        carregarDoadores();
+        carregarTabela();
+    }
+
+    private void carregarCategorias() {
+
+        cbCategoria.removeAllItems();
+
+        List<Categoria> lista = categoriaDAO.listar();
+
+        for (Categoria categoria : lista) {
+            cbCategoria.addItem(categoria.getNome());
+        }
+    }
+
+    private void carregarDoadores() {
+
+        cbDoador.removeAllItems();
+
+        List<Doador> lista = doadorDAO.listar();
+
+        for (Doador doador : lista) {
+            cbDoador.addItem(doador.getNome());
+        }
+    }
+
+    private void carregarTabela() {
+
+        DefaultTableModel modelo
+                = (DefaultTableModel) tableAlimentos.getModel();
+
+        modelo.setRowCount(0);
+
+        List<Alimento> lista
+                = alimentoDAO.listar();
+
+        List<Categoria> categorias
+                = categoriaDAO.listar();
+
+        List<Doador> doadores
+                = doadorDAO.listar();
+
+        for (Alimento alimento : lista) {
+
+            String nome_categoria = "";
+            String nome_doador = "";
+
+            for (Categoria categoria : categorias) {
+
+                if (categoria.getId_categoria()
+                        == alimento.getFk_categoria()) {
+
+                    nome_categoria
+                            = categoria.getNome();
+
+                    break;
+                }
+            }
+
+            for (Doador doador : doadores) {
+
+                if (doador.getId_doador()
+                        == alimento.getFk_doador()) {
+
+                    nome_doador
+                            = doador.getNome();
+
+                    break;
+                }
+            }
+
+            modelo.addRow(new Object[]{
+                alimento.getId_alimento(),
+                alimento.getNome(),
+                alimento.getQuantidade(),
+                alimento.getUnidade_medida(),
+                alimento.getData_validade(),
+                nome_categoria,
+                nome_doador,
+                alimento.getStatus()
+            });
+        }
+    }
+
+    private int buscarIdCategoriaPorNome(String nome) {
+
+        List<Categoria> lista = categoriaDAO.listar();
+
+        for (Categoria categoria : lista) {
+
+            if (categoria.getNome().equals(nome)) {
+                return categoria.getId_categoria();
+            }
+        }
+
+        return 0;
+    }
+
+    private int buscarIdDoadorPorNome(String nome) {
+
+        List<Doador> lista = doadorDAO.listar();
+
+        for (Doador doador : lista) {
+
+            if (doador.getNome().equals(nome)) {
+                return doador.getId_doador();
+            }
+        }
+
+        return 0;
+    }
+
+    private void limparCampos() {
+
+        txtNome.setText("");
+        txtDescricao.setText("");
+        txtQuantidade.setText("");
+        txtDataValidade.setText("");
+
+        if (cbUnidadeMedida.getItemCount() > 0) {
+            cbUnidadeMedida.setSelectedIndex(0);
+        }
+
+        if (cbCategoria.getItemCount() > 0) {
+            cbCategoria.setSelectedIndex(0);
+        }
+
+        if (cbDoador.getItemCount() > 0) {
+            cbDoador.setSelectedIndex(0);
+        }
+
+        if (cbStatus.getItemCount() > 0) {
+            cbStatus.setSelectedItem("DISPONIVEL");
+        }
+
+        id_alimento_selecionado = 0;
+
+        tableAlimentos.clearSelection();
+
+        txtNome.requestFocus();
+    }
+
+    private void carregarDescricaoDoBanco() {
+
+        Alimento alimento
+                = alimentoDAO.buscarPorId(
+                        id_alimento_selecionado
+                );
+
+        if (alimento != null) {
+
+            txtDescricao.setText(
+                    alimento.getDescricao()
+            );
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        lblTitulo = new javax.swing.JLabel();
+        lblNome = new javax.swing.JLabel();
+        lblDescricao = new javax.swing.JLabel();
+        lblQuantidade = new javax.swing.JLabel();
+        lblDataValidade = new javax.swing.JLabel();
+        lblCategoria = new javax.swing.JLabel();
+        lblDoador = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
+        txtNome = new javax.swing.JTextField();
+        txtDataValidade = new javax.swing.JTextField();
+        txtQuantidade = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtDescricao = new javax.swing.JTextArea();
+        cbUnidadeMedida = new javax.swing.JComboBox<>();
+        cbCategoria = new javax.swing.JComboBox<>();
+        cbDoador = new javax.swing.JComboBox<>();
+        cbStatus = new javax.swing.JComboBox<>();
+        btnCadastrar = new javax.swing.JButton();
+        btnAlterar = new javax.swing.JButton();
+        btnExcluir = new javax.swing.JButton();
+        btnLimpar = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        lblTitulo2 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tableAlimentos = new javax.swing.JTable();
+        jSeparator2 = new javax.swing.JSeparator();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setBackground(new java.awt.Color(245, 247, 245));
+
+        lblTitulo.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        lblTitulo.setForeground(new java.awt.Color(46, 125, 50));
+        lblTitulo.setText("GERENCIAR ALIMENTOS");
+
+        lblNome.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblNome.setForeground(new java.awt.Color(38, 50, 56));
+        lblNome.setText("Nome:");
+
+        lblDescricao.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblDescricao.setForeground(new java.awt.Color(38, 50, 56));
+        lblDescricao.setText("Descrição:");
+
+        lblQuantidade.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblQuantidade.setForeground(new java.awt.Color(38, 50, 56));
+        lblQuantidade.setText("Quantidade:");
+
+        lblDataValidade.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblDataValidade.setForeground(new java.awt.Color(38, 50, 56));
+        lblDataValidade.setText("Data Validade:");
+
+        lblCategoria.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblCategoria.setForeground(new java.awt.Color(38, 50, 56));
+        lblCategoria.setText("Categoria:");
+
+        lblDoador.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblDoador.setForeground(new java.awt.Color(38, 50, 56));
+        lblDoador.setText("Doador:");
+
+        lblStatus.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblStatus.setForeground(new java.awt.Color(38, 50, 56));
+        lblStatus.setText("Status:");
+
+        txtNome.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtNome.setForeground(new java.awt.Color(38, 50, 56));
+        txtNome.setToolTipText("Nome");
+
+        txtDataValidade.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtDataValidade.setForeground(new java.awt.Color(38, 50, 56));
+        txtDataValidade.setToolTipText("Data de Validade");
+
+        txtQuantidade.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtQuantidade.setForeground(new java.awt.Color(38, 50, 56));
+        txtQuantidade.setToolTipText("Quantidade");
+
+        txtDescricao.setColumns(20);
+        txtDescricao.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        txtDescricao.setForeground(new java.awt.Color(38, 50, 56));
+        txtDescricao.setLineWrap(true);
+        txtDescricao.setRows(5);
+        txtDescricao.setToolTipText("Descrição");
+        txtDescricao.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(txtDescricao);
+
+        cbUnidadeMedida.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        cbUnidadeMedida.setForeground(new java.awt.Color(38, 50, 56));
+        cbUnidadeMedida.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "kg", "g", "L", "ml", "unidade", "pacote", "caixa" }));
+        cbUnidadeMedida.setToolTipText("Unidade de Medida");
+        cbUnidadeMedida.addActionListener(this::cbUnidadeMedidaActionPerformed);
+
+        cbCategoria.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        cbCategoria.setForeground(new java.awt.Color(38, 50, 56));
+        cbCategoria.setToolTipText("Categoria");
+
+        cbDoador.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        cbDoador.setForeground(new java.awt.Color(38, 50, 56));
+        cbDoador.setToolTipText("Doador");
+
+        cbStatus.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        cbStatus.setForeground(new java.awt.Color(38, 50, 56));
+        cbStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "DISPONIVEL", "ESGOTADO", "VENCIDO" }));
+        cbStatus.setToolTipText("Status");
+
+        btnCadastrar.setBackground(new java.awt.Color(76, 175, 80));
+        btnCadastrar.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        btnCadastrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCadastrar.setText("Cadastrar");
+        btnCadastrar.setToolTipText("Cadastrar");
+        btnCadastrar.setBorderPainted(false);
+        btnCadastrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCadastrar.setFocusPainted(false);
+        btnCadastrar.setOpaque(true);
+        btnCadastrar.addActionListener(this::btnCadastrarActionPerformed);
+
+        btnAlterar.setBackground(new java.awt.Color(33, 150, 243));
+        btnAlterar.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        btnAlterar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAlterar.setText("Alterar");
+        btnAlterar.setToolTipText("Alterar");
+        btnAlterar.setBorderPainted(false);
+        btnAlterar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAlterar.setFocusPainted(false);
+        btnAlterar.setOpaque(true);
+        btnAlterar.addActionListener(this::btnAlterarActionPerformed);
+
+        btnExcluir.setBackground(new java.awt.Color(229, 57, 53));
+        btnExcluir.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        btnExcluir.setForeground(new java.awt.Color(255, 255, 255));
+        btnExcluir.setText("Excluir");
+        btnExcluir.setToolTipText("Excluir");
+        btnExcluir.setBorderPainted(false);
+        btnExcluir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnExcluir.setFocusPainted(false);
+        btnExcluir.setOpaque(true);
+        btnExcluir.addActionListener(this::btnExcluirActionPerformed);
+
+        btnLimpar.setBackground(new java.awt.Color(96, 125, 139));
+        btnLimpar.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        btnLimpar.setForeground(new java.awt.Color(255, 255, 255));
+        btnLimpar.setText("Limpar");
+        btnLimpar.setToolTipText("Limpar");
+        btnLimpar.setBorderPainted(false);
+        btnLimpar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnLimpar.setFocusPainted(false);
+        btnLimpar.setOpaque(true);
+        btnLimpar.addActionListener(this::btnLimparActionPerformed);
+
+        lblTitulo2.setFont(new java.awt.Font("Arial", 1, 24)); // NOI18N
+        lblTitulo2.setForeground(new java.awt.Color(46, 125, 50));
+        lblTitulo2.setText("ALIMENTOS");
+
+        tableAlimentos.setFont(new java.awt.Font("Arial", 0, 13)); // NOI18N
+        tableAlimentos.setForeground(new java.awt.Color(38, 50, 56));
+        tableAlimentos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Nome", "Quantidade", "Unidade", "Validade", "Categoria", "Doador", "Status"
+            }
+        ));
+        tableAlimentos.setGridColor(new java.awt.Color(224, 224, 224));
+        tableAlimentos.setInheritsPopupMenu(true);
+        tableAlimentos.setIntercellSpacing(new java.awt.Dimension(0, 1));
+        tableAlimentos.setRowHeight(28);
+        tableAlimentos.setSelectionBackground(new java.awt.Color(232, 245, 233));
+        tableAlimentos.setSelectionForeground(new java.awt.Color(38, 50, 56));
+        tableAlimentos.setShowGrid(true);
+        tableAlimentos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableAlimentosMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tableAlimentos);
+        if (tableAlimentos.getColumnModel().getColumnCount() > 0) {
+            tableAlimentos.getColumnModel().getColumn(0).setPreferredWidth(10);
+        }
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblNome, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 734, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addComponent(lblQuantidade)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbUnidadeMedida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDoador, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbDoador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblDataValidade, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDataValidade, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGap(0, 22, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStatus)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(312, 312, 312)
+                        .addComponent(lblTitulo2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(200, 200, 200)
+                        .addComponent(btnCadastrar)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnAlterar)
+                        .addGap(12, 12, 12)
+                        .addComponent(btnExcluir)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnLimpar)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jSeparator1)
+            .addComponent(jSeparator2)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(180, 180, 180))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(lblTitulo)
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(lblNome))
+                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(lblDescricao))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(26, 26, 26)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblQuantidade)
+                    .addComponent(txtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbUnidadeMedida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDataValidade)
+                    .addComponent(txtDataValidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblCategoria)
+                    .addComponent(cbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbDoador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDoador))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblStatus)
+                    .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(41, 41, 41)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnCadastrar)
+                    .addComponent(btnAlterar)
+                    .addComponent(btnExcluir)
+                    .addComponent(btnLimpar))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(lblTitulo2)
+                .addGap(12, 12, 12)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void cbUnidadeMedidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbUnidadeMedidaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbUnidadeMedidaActionPerformed
+
+    private void tableAlimentosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableAlimentosMouseClicked
+        int linha = tableAlimentos.getSelectedRow();
+
+        if (linha < 0) {
+            return;
+        }
+
+        id_alimento_selecionado
+                = Integer.parseInt(
+                        tableAlimentos
+                                .getValueAt(linha, 0)
+                                .toString()
+                );
+
+        txtNome.setText(
+                tableAlimentos
+                        .getValueAt(linha, 1)
+                        .toString()
+        );
+
+        txtQuantidade.setText(
+                tableAlimentos
+                        .getValueAt(linha, 2)
+                        .toString()
+        );
+
+        cbUnidadeMedida.setSelectedItem(
+                tableAlimentos
+                        .getValueAt(linha, 3)
+                        .toString()
+        );
+
+        Object valor_data
+                = tableAlimentos.getValueAt(linha, 4);
+
+        if (valor_data != null) {
+
+            LocalDate data_validade
+                    = LocalDate.parse(
+                            valor_data.toString()
+                    );
+
+            txtDataValidade.setText(
+                    data_validade.format(formato_data)
+            );
+        }
+
+        String nome_categoria
+                = tableAlimentos
+                        .getValueAt(linha, 5)
+                        .toString();
+
+        String nome_doador
+                = tableAlimentos
+                        .getValueAt(linha, 6)
+                        .toString();
+
+        cbCategoria.setSelectedItem(
+                nome_categoria
+        );
+
+        cbDoador.setSelectedItem(
+                nome_doador
+        );
+
+        cbStatus.setSelectedItem(
+                tableAlimentos
+                        .getValueAt(linha, 7)
+                        .toString()
+        );
+
+        carregarDescricaoDoBanco();
+    }//GEN-LAST:event_tableAlimentosMouseClicked
+
+    private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
+        String nome = txtNome.getText().trim();
+        String descricao = txtDescricao.getText().trim();
+        String quantidade_texto = txtQuantidade.getText().trim();
+        String data_texto = txtDataValidade.getText().trim();
+
+        if (nome.isEmpty()
+                || descricao.isEmpty()
+                || quantidade_texto.isEmpty()
+                || data_texto.isEmpty()
+                || cbCategoria.getSelectedItem() == null
+                || cbDoador.getSelectedItem() == null
+                || cbUnidadeMedida.getSelectedItem() == null
+                || cbStatus.getSelectedItem() == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Preencha todos os campos."
+            );
+
+            return;
+        }
+
+        try {
+
+            BigDecimal quantidade
+                    = new BigDecimal(
+                            quantidade_texto.replace(",", ".")
+                    );
+
+            if (quantidade.compareTo(BigDecimal.ZERO) <= 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "A quantidade deve ser maior que zero."
+                );
+
+                return;
+            }
+
+            LocalDate data_validade
+                    = LocalDate.parse(
+                            data_texto,
+                            formato_data
+                    );
+
+            String nome_categoria
+                    = cbCategoria.getSelectedItem().toString();
+
+            String nome_doador
+                    = cbDoador.getSelectedItem().toString();
+
+            int fk_categoria
+                    = buscarIdCategoriaPorNome(nome_categoria);
+
+            int fk_doador
+                    = buscarIdDoadorPorNome(nome_doador);
+
+            if (fk_categoria == 0 || fk_doador == 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Categoria ou doador não encontrado."
+                );
+
+                return;
+            }
+
+            Alimento alimento = new Alimento();
+
+            alimento.setNome(nome);
+            alimento.setDescricao(descricao);
+            alimento.setQuantidade(quantidade);
+
+            alimento.setUnidade_medida(
+                    cbUnidadeMedida
+                            .getSelectedItem()
+                            .toString()
+            );
+
+            alimento.setData_validade(
+                    data_validade
+            );
+
+            alimento.setStatus(
+                    cbStatus
+                            .getSelectedItem()
+                            .toString()
+            );
+
+            alimento.setFk_categoria(
+                    fk_categoria
+            );
+
+            alimento.setFk_doador(
+                    fk_doador
+            );
+
+            alimentoDAO.cadastrar(alimento);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Alimento cadastrado com sucesso!"
+            );
+
+            limparCampos();
+            carregarTabela();
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Digite uma quantidade válida."
+            );
+
+        } catch (DateTimeParseException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Digite a data no formato dd/MM/yyyy."
+            );
+        }
+    }//GEN-LAST:event_btnCadastrarActionPerformed
+
+    private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
+        limparCampos();
+    }//GEN-LAST:event_btnLimparActionPerformed
+
+    private void btnAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarActionPerformed
+        if (id_alimento_selecionado == 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Selecione um alimento na tabela."
+            );
+
+            return;
+        }
+
+        String nome
+                = txtNome.getText().trim();
+
+        String descricao
+                = txtDescricao.getText().trim();
+
+        String quantidade_texto
+                = txtQuantidade.getText().trim();
+
+        String data_texto
+                = txtDataValidade.getText().trim();
+
+        if (nome.isEmpty()
+                || descricao.isEmpty()
+                || quantidade_texto.isEmpty()
+                || data_texto.isEmpty()
+                || cbCategoria.getSelectedItem() == null
+                || cbDoador.getSelectedItem() == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Preencha todos os campos."
+            );
+
+            return;
+        }
+
+        try {
+
+            BigDecimal quantidade
+                    = new BigDecimal(
+                            quantidade_texto.replace(",", ".")
+                    );
+
+            // Quantidade pode ser 0,
+            // mas nunca pode ser negativa.
+            if (quantidade.compareTo(
+                    BigDecimal.ZERO) < 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "A quantidade não pode ser negativa."
+                );
+
+                return;
+            }
+
+            LocalDate data_validade
+                    = LocalDate.parse(
+                            data_texto,
+                            formato_data
+                    );
+
+            /*
+         * Define o status automaticamente.
+             */
+            String status;
+
+            if (data_validade.isBefore(
+                    LocalDate.now())) {
+
+                status = "VENCIDO";
+
+            } else if (quantidade.compareTo(
+                    BigDecimal.ZERO) == 0) {
+
+                status = "ESGOTADO";
+
+            } else {
+
+                status = "DISPONIVEL";
+            }
+
+            String nome_categoria
+                    = cbCategoria
+                            .getSelectedItem()
+                            .toString();
+
+            String nome_doador
+                    = cbDoador
+                            .getSelectedItem()
+                            .toString();
+
+            int fk_categoria
+                    = buscarIdCategoriaPorNome(
+                            nome_categoria
+                    );
+
+            int fk_doador
+                    = buscarIdDoadorPorNome(
+                            nome_doador
+                    );
+
+            if (fk_categoria == 0
+                    || fk_doador == 0) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Categoria ou doador não encontrado."
+                );
+
+                return;
+            }
+
+            Alimento alimento
+                    = new Alimento();
+
+            alimento.setId_alimento(
+                    id_alimento_selecionado
+            );
+
+            alimento.setNome(nome);
+            alimento.setDescricao(descricao);
+            alimento.setQuantidade(quantidade);
+
+            alimento.setUnidade_medida(
+                    cbUnidadeMedida
+                            .getSelectedItem()
+                            .toString()
+            );
+
+            alimento.setData_validade(
+                    data_validade
+            );
+
+            alimento.setStatus(status);
+
+            alimento.setFk_categoria(
+                    fk_categoria
+            );
+
+            alimento.setFk_doador(
+                    fk_doador
+            );
+
+            alimentoDAO.atualizar(alimento);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Alimento alterado com sucesso!"
+            );
+
+            limparCampos();
+            carregarTabela();
+
+        } catch (NumberFormatException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Digite uma quantidade válida."
+            );
+
+        } catch (DateTimeParseException e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Digite a data no formato dd/MM/yyyy."
+            );
+        }
+    }//GEN-LAST:event_btnAlterarActionPerformed
+
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+        if (id_alimento_selecionado == 0) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Selecione um alimento na tabela."
+            );
+
+            return;
+        }
+
+        int resposta
+                = JOptionPane.showConfirmDialog(
+                        this,
+                        "Deseja realmente excluir este alimento?",
+                        "Confirmação",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+        if (resposta == JOptionPane.YES_OPTION) {
+
+            alimentoDAO.excluir(
+                    id_alimento_selecionado
+            );
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Alimento excluído com sucesso!"
+            );
+
+            limparCampos();
+            carregarTabela();
+        }
+    }//GEN-LAST:event_btnExcluirActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new TelaAlimento().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAlterar;
+    private javax.swing.JButton btnCadastrar;
+    private javax.swing.JButton btnExcluir;
+    private javax.swing.JButton btnLimpar;
+    private javax.swing.JComboBox<String> cbCategoria;
+    private javax.swing.JComboBox<String> cbDoador;
+    private javax.swing.JComboBox<String> cbStatus;
+    private javax.swing.JComboBox<String> cbUnidadeMedida;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel lblCategoria;
+    private javax.swing.JLabel lblDataValidade;
+    private javax.swing.JLabel lblDescricao;
+    private javax.swing.JLabel lblDoador;
+    private javax.swing.JLabel lblNome;
+    private javax.swing.JLabel lblQuantidade;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JLabel lblTitulo2;
+    private javax.swing.JTable tableAlimentos;
+    private javax.swing.JTextField txtDataValidade;
+    private javax.swing.JTextArea txtDescricao;
+    private javax.swing.JTextField txtNome;
+    private javax.swing.JTextField txtQuantidade;
+    // End of variables declaration//GEN-END:variables
+}
