@@ -68,5 +68,9 @@ public class Administrador {
         this.status = status;
     }
     
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+    
     
 }
