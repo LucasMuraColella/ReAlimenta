@@ -111,7 +111,7 @@ public class TelaAprovacaoSolicitacao extends javax.swing.JFrame {
                                 .getFk_instituicao()) {
 
                     nome_instituicao
-                            = instituicao.getResponsavel();
+                            = instituicao.getNome();
 
                     break;
                 }

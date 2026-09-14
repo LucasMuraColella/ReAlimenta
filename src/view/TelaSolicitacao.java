@@ -41,7 +41,7 @@ public class TelaSolicitacao extends javax.swing.JFrame {
     public TelaSolicitacao() {
         initComponents();
         setLocationRelativeTo(null);
-        
+
         carregarInstituicoes();
         carregarAlimentos();
         carregarSolicitacoes();
@@ -57,7 +57,7 @@ public class TelaSolicitacao extends javax.swing.JFrame {
         for (Instituicao instituicao : lista) {
 
             cbInstituicao.addItem(
-                    instituicao.getResponsavel()
+                    instituicao.getNome()
             );
         }
     }
@@ -81,16 +81,16 @@ public class TelaSolicitacao extends javax.swing.JFrame {
         }
     }
 
-    private Instituicao buscarInstituicaoPorResponsavel(
-            String responsavel) {
+    private Instituicao buscarInstituicaoPorNome(
+            String nome) {
 
         List<Instituicao> lista
                 = instituicaoDAO.listar();
 
         for (Instituicao instituicao : lista) {
 
-            if (instituicao.getResponsavel()
-                    .equals(responsavel)) {
+            if (instituicao.getNome()
+                    .equals(nome)) {
 
                 return instituicao;
             }
@@ -142,7 +142,7 @@ public class TelaSolicitacao extends javax.swing.JFrame {
                                 .getFk_instituicao()) {
 
                     nome_instituicao
-                            = instituicao.getResponsavel();
+                            = instituicao.getNome();
 
                     break;
                 }
@@ -705,7 +705,7 @@ public class TelaSolicitacao extends javax.swing.JFrame {
                         .toString();
 
         Instituicao instituicao
-                = buscarInstituicaoPorResponsavel(
+                = buscarInstituicaoPorNome(
                         nome_instituicao
                 );
 
@@ -809,7 +809,7 @@ public class TelaSolicitacao extends javax.swing.JFrame {
                             .getFk_instituicao()) {
 
                 cbInstituicao.setSelectedItem(
-                        instituicao.getResponsavel()
+                        instituicao.getNome()
                 );
 
                 break;
@@ -869,7 +869,7 @@ public class TelaSolicitacao extends javax.swing.JFrame {
         }
 
         Instituicao instituicao
-                = buscarInstituicaoPorResponsavel(
+                = buscarInstituicaoPorNome(
                         cbInstituicao
                                 .getSelectedItem()
                                 .toString()

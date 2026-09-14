@@ -674,6 +674,12 @@ public class TelaDoador extends javax.swing.JFrame {
                     tableDoadores.getValueAt(linha, 0).toString()
             );
 
+            txtNome.setText(
+                    tableDoadores
+                            .getValueAt(linha, 1)
+                            .toString()
+            );
+
             txtCpfCnpj.setText(
                     MascaraUtil.formatarCpfCnpj(
                             tableDoadores
@@ -696,10 +702,6 @@ public class TelaDoador extends javax.swing.JFrame {
                                     .getValueAt(linha, 4)
                                     .toString()
                     )
-            );
-
-            txtCep.setText(
-                    tableDoadores.getValueAt(linha, 4).toString()
             );
 
             txtRua.setText(

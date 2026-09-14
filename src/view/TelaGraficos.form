@@ -33,11 +33,6 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jSeparator2" max="32767" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="370" max="-2" attributes="0"/>
-                      <Component id="lblTitulo" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="395" max="32767" attributes="0"/>
-                  </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -73,6 +68,10 @@
                   </Group>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <EmptySpace min="-2" pref="370" max="-2" attributes="0"/>
+                              <Component id="lblTitulo" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="93" max="-2" attributes="0"/>
                               <Component id="jLabel1" min="-2" pref="679" max="-2" attributes="0"/>
@@ -160,10 +159,11 @@
           <Color blue="38" green="32" red="26" type="rgb"/>
         </Property>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="3">
-            <StringItem index="0" value="Doa&#xe7;&#xf5;es por m&#xea;s"/>
+          <StringArray count="4">
+            <StringItem index="0" value="Alimentos cadastrados por m&#xea;s"/>
             <StringItem index="1" value="Alimentos por categoria"/>
             <StringItem index="2" value="Solicita&#xe7;&#xf5;es por status"/>
+            <StringItem index="3" value="Alimentos por status"/>
           </StringArray>
         </Property>
       </Properties>

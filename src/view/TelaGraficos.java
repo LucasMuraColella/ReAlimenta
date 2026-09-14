@@ -35,7 +35,7 @@ public class TelaGraficos extends javax.swing.JFrame {
         txtDataFinal.setToolTipText("Formato: dd/MM/yyyy");
     }
 
-    private void gerarGraficoDoacoes(LocalDate data_inicial, LocalDate data_final) {
+    private void gerarGraficoAlimentosPorMes(LocalDate data_inicial, LocalDate data_final) {
 
         List<Object[]> dados
                 = graficoDAO.doacoesPorMes(data_inicial, data_final);
@@ -53,14 +53,14 @@ public class TelaGraficos extends javax.swing.JFrame {
 
             dataset.addValue(
                     total,
-                    "Doações",
+                    "Alimentos",
                     mes
             );
         }
 
         JFreeChart chart
                 = ChartFactory.createBarChart(
-                        "Doações por mês",
+                        "Alimentos cadastrados por mês",
                         "Mês",
                         "Quantidade",
                         dataset
@@ -122,6 +122,15 @@ public class TelaGraficos extends javax.swing.JFrame {
                         true,
                         false
                 );
+
+        org.jfree.chart.plot.PiePlot plot
+                = (org.jfree.chart.plot.PiePlot) chart.getPlot();
+
+        plot.setLabelGenerator(
+                new org.jfree.chart.labels.StandardPieSectionLabelGenerator(
+                        "{0} = {1}"
+                )
+        );
 
         ChartPanel chartPanel
                 = new ChartPanel(chart);
@@ -199,6 +208,72 @@ public class TelaGraficos extends javax.swing.JFrame {
         );
     }
 
+    private void gerarGraficoStatus(
+            LocalDate data_inicial,
+            LocalDate data_final) {
+
+        List<Object[]> dados
+                = graficoDAO.alimentosPorStatus(
+                        data_inicial,
+                        data_final
+                );
+
+        DefaultPieDataset dataset
+                = new DefaultPieDataset();
+
+        for (Object[] linha : dados) {
+
+            String status
+                    = linha[0].toString();
+
+            int total
+                    = Integer.parseInt(
+                            linha[1].toString()
+                    );
+
+            dataset.setValue(
+                    status,
+                    total
+            );
+        }
+
+        JFreeChart chart
+                = ChartFactory.createPieChart(
+                        "Alimentos por status",
+                        dataset,
+                        true,
+                        true,
+                        false
+                );
+
+        org.jfree.chart.plot.PiePlot plot
+                = (org.jfree.chart.plot.PiePlot) chart.getPlot();
+
+        plot.setLabelGenerator(
+                new org.jfree.chart.labels.StandardPieSectionLabelGenerator(
+                        "{0} = {1}"
+                )
+        );
+
+        ChartPanel chartPanel
+                = new ChartPanel(chart);
+
+        chartPanel.setPreferredSize(
+                new Dimension(800, 480)
+        );
+
+        panelGrafico.removeAll();
+
+        panelGrafico.setLayout(
+                new BorderLayout()
+        );
+
+        panelGrafico.add(
+                chartPanel,
+                BorderLayout.CENTER
+        );
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -236,7 +311,7 @@ public class TelaGraficos extends javax.swing.JFrame {
 
         cbTipoGrafico.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         cbTipoGrafico.setForeground(new java.awt.Color(38, 50, 56));
-        cbTipoGrafico.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Doações por mês", "Alimentos por categoria", "Solicitações por status" }));
+        cbTipoGrafico.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Alimentos cadastrados por mês", "Alimentos por categoria", "Solicitações por status", "Alimentos por status" }));
 
         btnGerar.setBackground(new java.awt.Color(76, 175, 80));
         btnGerar.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
@@ -307,10 +382,6 @@ public class TelaGraficos extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jSeparator2))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(370, 370, 370)
-                        .addComponent(lblTitulo)
-                        .addGap(0, 395, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(69, 69, 69)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -337,6 +408,9 @@ public class TelaGraficos extends javax.swing.JFrame {
                                 .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(370, 370, 370)
+                                .addComponent(lblTitulo))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(93, 93, 93)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 679, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -452,9 +526,9 @@ public class TelaGraficos extends javax.swing.JFrame {
 
         panelGrafico.removeAll();
 
-        if (tipo.equals("Doações por mês")) {
+        if (tipo.equals("Alimentos cadastrados por mês")) {
 
-            gerarGraficoDoacoes(
+            gerarGraficoAlimentosPorMes(
                     data_inicial,
                     data_final
             );
@@ -469,6 +543,13 @@ public class TelaGraficos extends javax.swing.JFrame {
         } else if (tipo.equals("Solicitações por status")) {
 
             gerarGraficoSolicitacoes(
+                    data_inicial,
+                    data_final
+            );
+
+        } else if (tipo.equals("Alimentos por status")) {
+
+            gerarGraficoStatus(
                     data_inicial,
                     data_final
             );

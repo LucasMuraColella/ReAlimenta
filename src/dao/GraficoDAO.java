@@ -13,7 +13,7 @@ import java.util.List;
 public class GraficoDAO {
 
     // ============================================================
-    // DOAÇÕES POR MÊS
+    // ALIMENTOS CADASTRADOS POR MÊS
     // ============================================================
     public List<Object[]> doacoesPorMes(
             LocalDate data_inicial,
@@ -32,7 +32,8 @@ public class GraficoDAO {
                 + "ORDER BY mes";
 
         try (
-                Connection conexao = Conexao.conectar(); PreparedStatement stmt
+                Connection conexao = Conexao.conectar();
+                PreparedStatement stmt
                 = conexao.prepareStatement(sql)) {
 
             stmt.setDate(
@@ -57,6 +58,7 @@ public class GraficoDAO {
             }
 
         } catch (SQLException e) {
+
             e.printStackTrace();
         }
 
@@ -85,7 +87,8 @@ public class GraficoDAO {
                 + "ORDER BY total DESC";
 
         try (
-                Connection conexao = Conexao.conectar(); PreparedStatement stmt
+                Connection conexao = Conexao.conectar();
+                PreparedStatement stmt
                 = conexao.prepareStatement(sql)) {
 
             stmt.setDate(
@@ -110,6 +113,7 @@ public class GraficoDAO {
             }
 
         } catch (SQLException e) {
+
             e.printStackTrace();
         }
 
@@ -136,7 +140,8 @@ public class GraficoDAO {
                 + "ORDER BY status";
 
         try (
-                Connection conexao = Conexao.conectar(); PreparedStatement stmt
+                Connection conexao = Conexao.conectar();
+                PreparedStatement stmt
                 = conexao.prepareStatement(sql)) {
 
             stmt.setDate(
@@ -161,6 +166,60 @@ public class GraficoDAO {
             }
 
         } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+    // ============================================================
+    // ALIMENTOS POR STATUS
+    // ============================================================
+    public List<Object[]> alimentosPorStatus(
+            LocalDate data_inicial,
+            LocalDate data_final) {
+
+        List<Object[]> lista
+                = new ArrayList<>();
+
+        String sql
+                = "SELECT "
+                + "status, "
+                + "COUNT(*) AS total "
+                + "FROM alimento "
+                + "WHERE data_cadastro BETWEEN ? AND ? "
+                + "GROUP BY status "
+                + "ORDER BY status";
+
+        try (
+                Connection conexao = Conexao.conectar();
+                PreparedStatement stmt
+                = conexao.prepareStatement(sql)) {
+
+            stmt.setDate(
+                    1,
+                    java.sql.Date.valueOf(data_inicial)
+            );
+
+            stmt.setDate(
+                    2,
+                    java.sql.Date.valueOf(data_final)
+            );
+
+            ResultSet rs
+                    = stmt.executeQuery();
+
+            while (rs.next()) {
+
+                lista.add(new Object[]{
+                    rs.getString("status"),
+                    rs.getInt("total")
+                });
+            }
+
+        } catch (SQLException e) {
+
             e.printStackTrace();
         }
 

@@ -668,11 +668,32 @@ public class TelaAlimento extends javax.swing.JFrame {
                     data_validade
             );
 
-            alimento.setStatus(
-                    cbStatus
-                            .getSelectedItem()
-                            .toString()
-            );
+// Não permite cadastrar alimento vencido
+            if (data_validade.isBefore(LocalDate.now())) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Não é possível cadastrar um alimento vencido.",
+                        "Data de validade inválida",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+            }
+
+// Define automaticamente o status
+            String status;
+
+            if (quantidade.compareTo(BigDecimal.ZERO) == 0) {
+
+                status = "ESGOTADO";
+
+            } else {
+
+                status = "DISPONIVEL";
+            }
+
+            alimento.setStatus(status);
 
             alimento.setFk_categoria(
                     fk_categoria

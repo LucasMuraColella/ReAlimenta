@@ -56,7 +56,7 @@ public class RelatorioDAO {
         String sql
                 = "SELECT "
                 + "s.id_solicitacao, "
-                + "i.responsavel AS instituicao, "
+                + "i.nome AS instituicao, "
                 + "s.data_solicitacao, "
                 + "s.status "
                 + "FROM solicitacao s "

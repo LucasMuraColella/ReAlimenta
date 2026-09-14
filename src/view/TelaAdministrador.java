@@ -530,9 +530,7 @@ public class TelaAdministrador extends javax.swing.JFrame {
                 administrador.getEmail()
         );
 
-        txtSenha.setText(
-                administrador.getSenha()
-        );
+        txtSenha.setText("");
 
         txtTelefone.setText(
                 MascaraUtil.formatarTelefone(
