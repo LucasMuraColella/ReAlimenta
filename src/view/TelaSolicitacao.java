@@ -310,7 +310,7 @@ public class TelaSolicitacao extends javax.swing.JFrame {
 
         cbAlimento.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         cbAlimento.setForeground(new java.awt.Color(38, 50, 56));
-        cbAlimento.setToolTipText("Alimentos");
+        cbAlimento.setToolTipText("Alimentos Disponíveis");
 
         btnAdicionarItem.setBackground(new java.awt.Color(76, 175, 80));
         btnAdicionarItem.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
@@ -347,7 +347,15 @@ public class TelaSolicitacao extends javax.swing.JFrame {
             new String [] {
                 "Alimento", "Quantidade", "Unidade"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableItens.setGridColor(new java.awt.Color(224, 224, 224));
         tableItens.setIntercellSpacing(new java.awt.Dimension(0, 1));
         tableItens.setRowHeight(28);
@@ -413,7 +421,15 @@ public class TelaSolicitacao extends javax.swing.JFrame {
             new String [] {
                 "ID", "Instituição", "Data", "Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableSolicitacoes.setGridColor(new java.awt.Color(224, 224, 224));
         tableSolicitacoes.setIntercellSpacing(new java.awt.Dimension(0, 1));
         tableSolicitacoes.setRowHeight(28);

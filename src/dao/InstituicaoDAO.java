@@ -18,8 +18,7 @@ public class InstituicaoDAO {
                 + "(nome, cnpj, responsavel, cep, rua, numero, bairro) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, instituicao.getNome());
             stmt.setString(2, instituicao.getCnpj());
@@ -42,9 +41,7 @@ public class InstituicaoDAO {
 
         String sql = "SELECT * FROM instituicao ORDER BY id_instituicao";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
 
@@ -57,7 +54,7 @@ public class InstituicaoDAO {
                 instituicao.setNome(
                         rs.getString("nome")
                 );
-                
+
                 instituicao.setCnpj(
                         rs.getString("cnpj")
                 );
@@ -97,8 +94,7 @@ public class InstituicaoDAO {
         String sql = "SELECT * FROM instituicao "
                 + "WHERE id_instituicao = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
@@ -111,7 +107,7 @@ public class InstituicaoDAO {
                     instituicao.setId_instituicao(
                             rs.getInt("id_instituicao")
                     );
-                    
+
                     instituicao.setNome(
                             rs.getString("nome")
                     );
@@ -163,8 +159,7 @@ public class InstituicaoDAO {
                 + "bairro = ? "
                 + "WHERE id_instituicao = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, instituicao.getNome());
             stmt.setString(2, instituicao.getCnpj());
@@ -182,20 +177,29 @@ public class InstituicaoDAO {
         }
     }
 
-    public void excluir(int id) {
+    public boolean excluir(int id) {
 
         String sql = "DELETE FROM instituicao "
                 + "WHERE id_instituicao = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
             stmt.executeUpdate();
 
+            return true;
+
         } catch (SQLException e) {
+
+            // Violação de chave estrangeira
+            if ("23503".equals(e.getSQLState())) {
+                return false;
+            }
+
             e.printStackTrace();
         }
+
+        return false;
     }
 }

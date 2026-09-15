@@ -18,8 +18,7 @@ public class DoadorDAO {
                 + "(nome, cpf_cnpj, telefone, cep, rua, numero, bairro) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, doador.getNome());
             stmt.setString(2, doador.getCpf_cnpj());
@@ -42,9 +41,7 @@ public class DoadorDAO {
 
         String sql = "SELECT * FROM doador ORDER BY id_doador";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
 
@@ -73,8 +70,7 @@ public class DoadorDAO {
 
         String sql = "SELECT * FROM doador WHERE id_doador = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
@@ -139,8 +135,7 @@ public class DoadorDAO {
                 + "bairro = ? "
                 + "WHERE id_doador = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, doador.getNome());
             stmt.setString(2, doador.getCpf_cnpj());
@@ -158,19 +153,28 @@ public class DoadorDAO {
         }
     }
 
-    public void excluir(int id) {
+    public boolean excluir(int id) {
 
         String sql = "DELETE FROM doador WHERE id_doador = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
             stmt.executeUpdate();
 
+            return true;
+
         } catch (SQLException e) {
+
+            // Violação de chave estrangeira
+            if ("23503".equals(e.getSQLState())) {
+                return false;
+            }
+
             e.printStackTrace();
         }
+
+        return false;
     }
 }

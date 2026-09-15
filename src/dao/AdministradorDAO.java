@@ -209,7 +209,7 @@ public class AdministradorDAO {
         }
     }
 
-    public void excluir(int id) {
+    public boolean excluir(int id) {
 
         String sql
                 = "DELETE FROM administrador "
@@ -222,9 +222,19 @@ public class AdministradorDAO {
 
             stmt.executeUpdate();
 
+            return true;
+
         } catch (SQLException e) {
+
+            // Violação de chave estrangeira
+            if ("23503".equals(e.getSQLState())) {
+                return false;
+            }
+
             e.printStackTrace();
         }
+
+        return false;
     }
 
     public Administrador buscarPorEmail(String email) {
@@ -281,5 +291,51 @@ public class AdministradorDAO {
         }
 
         return null;
+    }
+
+    public void atualizarSemAlterarSenha(
+            Administrador administrador) {
+
+        String sql
+                = "UPDATE administrador SET "
+                + "nome = ?, "
+                + "email = ?, "
+                + "telefone = ?, "
+                + "status = ? "
+                + "WHERE id_adm = ?";
+
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt
+                = conexao.prepareStatement(sql)) {
+
+            stmt.setString(
+                    1,
+                    administrador.getNome()
+            );
+
+            stmt.setString(
+                    2,
+                    administrador.getEmail()
+            );
+
+            stmt.setString(
+                    3,
+                    administrador.getTelefone()
+            );
+
+            stmt.setBoolean(
+                    4,
+                    administrador.isStatus()
+            );
+
+            stmt.setInt(
+                    5,
+                    administrador.getId_adm()
+            );
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -20,8 +20,7 @@ public class AlimentoDAO {
                 + "data_validade, status, fk_doador, fk_categoria) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, alimento.getNome());
             stmt.setString(2, alimento.getDescricao());
@@ -45,9 +44,7 @@ public class AlimentoDAO {
 
         String sql = "SELECT * FROM alimento ORDER BY id_alimento";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
 
@@ -73,8 +70,8 @@ public class AlimentoDAO {
                         rs.getString("unidade_medida")
                 );
 
-                Date dataValidade =
-                        rs.getDate("data_validade");
+                Date dataValidade
+                        = rs.getDate("data_validade");
 
                 if (dataValidade != null) {
                     alimento.setData_validade(
@@ -82,8 +79,8 @@ public class AlimentoDAO {
                     );
                 }
 
-                Date dataCadastro =
-                        rs.getDate("data_cadastro");
+                Date dataCadastro
+                        = rs.getDate("data_cadastro");
 
                 if (dataCadastro != null) {
                     alimento.setData_cadastro(
@@ -118,8 +115,7 @@ public class AlimentoDAO {
         String sql = "SELECT * FROM alimento "
                 + "WHERE id_alimento = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
@@ -149,8 +145,8 @@ public class AlimentoDAO {
                             rs.getString("unidade_medida")
                     );
 
-                    Date dataValidade =
-                            rs.getDate("data_validade");
+                    Date dataValidade
+                            = rs.getDate("data_validade");
 
                     if (dataValidade != null) {
                         alimento.setData_validade(
@@ -158,8 +154,8 @@ public class AlimentoDAO {
                         );
                     }
 
-                    Date dataCadastro =
-                            rs.getDate("data_cadastro");
+                    Date dataCadastro
+                            = rs.getDate("data_cadastro");
 
                     if (dataCadastro != null) {
                         alimento.setData_cadastro(
@@ -203,8 +199,7 @@ public class AlimentoDAO {
                 + "fk_categoria = ? "
                 + "WHERE id_alimento = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, alimento.getNome());
             stmt.setString(2, alimento.getDescricao());
@@ -226,20 +221,29 @@ public class AlimentoDAO {
         }
     }
 
-    public void excluir(int id) {
+    public boolean excluir(int id) {
 
         String sql = "DELETE FROM alimento "
                 + "WHERE id_alimento = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
             stmt.executeUpdate();
 
+            return true;
+
         } catch (SQLException e) {
+
+            // Violação de chave estrangeira
+            if ("23503".equals(e.getSQLState())) {
+                return false;
+            }
+
             e.printStackTrace();
         }
+
+        return false;
     }
 }

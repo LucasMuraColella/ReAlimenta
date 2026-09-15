@@ -3,6 +3,7 @@ package view;
 import dao.RelatorioDAO;
 
 import java.util.List;
+import javax.swing.JOptionPane;
 
 import javax.swing.table.DefaultTableModel;
 
@@ -13,9 +14,59 @@ public class TelaRelatorios extends javax.swing.JFrame {
     private RelatorioDAO relatorioDAO
             = new RelatorioDAO();
 
+    private List<Object[]> dadosRelatorioAtual
+            = new java.util.ArrayList<>();
+
     public TelaRelatorios() {
         initComponents();
         setLocationRelativeTo(null);
+
+        carregarOpcoesFiltro();
+    }
+
+    private void carregarOpcoesFiltro() {
+
+        String tipo
+                = cbTipoRelatorio
+                        .getSelectedItem()
+                        .toString();
+
+        cbFiltroStatus.removeAllItems();
+
+        if (tipo.equals("Solicitações")) {
+
+            cbFiltroStatus.addItem("TODOS");
+            cbFiltroStatus.addItem("PENDENTE");
+            cbFiltroStatus.addItem("APROVADA");
+            cbFiltroStatus.addItem("REJEITADA");
+            cbFiltroStatus.addItem("CANCELADA");
+
+        } else if (tipo.equals("Entregas")) {
+
+            cbFiltroStatus.addItem("TODOS");
+            cbFiltroStatus.addItem("REGISTRADA");
+            cbFiltroStatus.addItem("ENTREGUE");
+            cbFiltroStatus.addItem("CANCELADA");
+
+        } else if (tipo.equals("Estoque")) {
+
+            cbFiltroStatus.addItem("TODOS");
+            cbFiltroStatus.addItem("DISPONIVEL");
+            cbFiltroStatus.addItem("ESGOTADO");
+            cbFiltroStatus.addItem("VENCIDO");
+
+        } else {
+
+            // Doações não possuem status
+            cbFiltroStatus.addItem("TODOS");
+        }
+
+        cbFiltroStatus.setEnabled(true);
+        btnFiltrar.setEnabled(true);
+
+        if (cbFiltroStatus.getItemCount() > 0) {
+            cbFiltroStatus.setSelectedIndex(0);
+        }
     }
 
     /**
@@ -37,6 +88,9 @@ public class TelaRelatorios extends javax.swing.JFrame {
         btnLimpar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableRelatorio = new javax.swing.JTable();
+        lblFiltroStatus = new javax.swing.JLabel();
+        cbFiltroStatus = new javax.swing.JComboBox<>();
+        btnFiltrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(245, 247, 245));
@@ -88,7 +142,7 @@ public class TelaRelatorios extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         tableRelatorio.setGridColor(new java.awt.Color(224, 224, 224));
@@ -99,35 +153,63 @@ public class TelaRelatorios extends javax.swing.JFrame {
         tableRelatorio.setShowGrid(true);
         jScrollPane1.setViewportView(tableRelatorio);
 
+        lblFiltroStatus.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblFiltroStatus.setForeground(new java.awt.Color(38, 50, 56));
+        lblFiltroStatus.setText("Filtrar por Status");
+
+        cbFiltroStatus.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        cbFiltroStatus.setForeground(new java.awt.Color(38, 50, 56));
+        cbFiltroStatus.setToolTipText("Filtro por Status");
+        cbFiltroStatus.addActionListener(this::cbFiltroStatusActionPerformed);
+
+        btnFiltrar.setBackground(new java.awt.Color(33, 150, 243));
+        btnFiltrar.setFont(new java.awt.Font("Arial", 1, 13)); // NOI18N
+        btnFiltrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnFiltrar.setText("Filtrar");
+        btnFiltrar.setToolTipText("Filtrar");
+        btnFiltrar.setBorderPainted(false);
+        btnFiltrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnFiltrar.setFocusPainted(false);
+        btnFiltrar.setOpaque(true);
+        btnFiltrar.addActionListener(this::btnFiltrarActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(lblTipoRelatorio)
-                .addGap(18, 18, 18)
-                .addComponent(cbTipoRelatorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnGerar)
-                .addGap(76, 76, 76))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 490, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(223, 223, 223)
-                        .addComponent(btnLimpar))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(179, 179, 179)
+                        .addGap(239, 239, 239)
                         .addComponent(lblTitulo))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(185, 185, 185)
-                        .addComponent(lblTitulo2)))
-                .addContainerGap(21, Short.MAX_VALUE))
+                        .addGap(30, 30, 30)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTipoRelatorio)
+                            .addComponent(lblFiltroStatus))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(cbTipoRelatorio, 0, 184, Short.MAX_VALUE)
+                            .addComponent(cbFiltroStatus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnGerar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnFiltrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(41, Short.MAX_VALUE))
+            .addComponent(jSeparator2)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(236, 236, 236)
+                        .addComponent(lblTitulo2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 607, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -140,17 +222,23 @@ public class TelaRelatorios extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblTipoRelatorio)
                     .addComponent(cbTipoRelatorio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnGerar))
-                .addGap(33, 33, 33)
+                    .addComponent(btnGerar)
+                    .addComponent(btnLimpar))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFiltroStatus)
+                    .addComponent(cbFiltroStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFiltrar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblTitulo2)
-                .addGap(12, 12, 12)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(btnLimpar)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
         );
+
+        btnFiltrar.getAccessibleContext().setAccessibleDescription("Filtrar");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -229,7 +317,10 @@ public class TelaRelatorios extends javax.swing.JFrame {
             );
         }
 
-        for (Object[] linha : dados) {
+        dadosRelatorioAtual
+                = new java.util.ArrayList<>(dados);
+
+        for (Object[] linha : dadosRelatorioAtual) {
             modelo.addRow(linha);
         }
     }//GEN-LAST:event_btnGerarActionPerformed
@@ -239,11 +330,90 @@ public class TelaRelatorios extends javax.swing.JFrame {
                 = (DefaultTableModel) tableRelatorio.getModel();
 
         modelo.setRowCount(0);
+
+        modelo.setColumnIdentifiers(
+                new Object[]{}
+        );
+
+        dadosRelatorioAtual.clear();
+        
+        cbTipoRelatorio.setSelectedIndex(0);
+
+        carregarOpcoesFiltro();
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void cbTipoRelatorioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbTipoRelatorioActionPerformed
-        // TODO add your handling code here:
+        carregarOpcoesFiltro();
     }//GEN-LAST:event_cbTipoRelatorioActionPerformed
+
+    private void cbFiltroStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbFiltroStatusActionPerformed
+
+    }//GEN-LAST:event_cbFiltroStatusActionPerformed
+
+    private void btnFiltrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarActionPerformed
+        DefaultTableModel modelo
+                = (DefaultTableModel) tableRelatorio.getModel();
+
+        if (dadosRelatorioAtual.isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Gere um relatório antes de aplicar o filtro.",
+                    "Atenção",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        String tipo
+                = cbTipoRelatorio
+                        .getSelectedItem()
+                        .toString();
+
+        String filtro
+                = cbFiltroStatus
+                        .getSelectedItem()
+                        .toString();
+
+        // Relatório de Doações não possui status
+        if (tipo.equals("Doações")) {
+            return;
+        }
+
+        // Limpa somente as linhas
+        modelo.setRowCount(0);
+
+        // Se TODOS estiver selecionado,
+        // mostra novamente o relatório completo
+        if (filtro.equals("TODOS")) {
+
+            for (Object[] linha
+                    : dadosRelatorioAtual) {
+
+                modelo.addRow(linha);
+            }
+
+            return;
+        }
+
+        // O status é sempre a última coluna
+        int colunaStatus
+                = modelo.getColumnCount() - 1;
+
+        for (Object[] linha
+                : dadosRelatorioAtual) {
+
+            String status
+                    = linha[colunaStatus]
+                            .toString();
+
+            if (status.equals(filtro)) {
+
+                modelo.addRow(linha);
+            }
+        }
+    }//GEN-LAST:event_btnFiltrarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -271,12 +441,15 @@ public class TelaRelatorios extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFiltrar;
     private javax.swing.JButton btnGerar;
     private javax.swing.JButton btnLimpar;
+    private javax.swing.JComboBox<String> cbFiltroStatus;
     private javax.swing.JComboBox<String> cbTipoRelatorio;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel lblFiltroStatus;
     private javax.swing.JLabel lblTipoRelatorio;
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JLabel lblTitulo2;

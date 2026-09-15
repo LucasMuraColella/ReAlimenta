@@ -243,7 +243,15 @@ public class TelaInstituicao extends javax.swing.JFrame {
             new String [] {
                 "ID", "Instituição", "CNPJ", "Responsável", "CEP", "Rua", "Número", "Bairro"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableInstituicoes.setGridColor(new java.awt.Color(224, 224, 224));
         tableInstituicoes.setIntercellSpacing(new java.awt.Dimension(0, 1));
         tableInstituicoes.setRowHeight(28);
@@ -681,17 +689,36 @@ public class TelaInstituicao extends javax.swing.JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
 
-            instituicaoDAO.excluir(
-                    idInstituicaoSelecionada
-            );
+            boolean excluiu
+                    = instituicaoDAO.excluir(
+                            idInstituicaoSelecionada
+                    );
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Instituição excluída com sucesso!"
-            );
+            if (excluiu) {
 
-            limparCampos();
-            carregarTabela();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Instituição excluída com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                limparCampos();
+                carregarTabela();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Não é possível excluir esta instituição.\n\n"
+                        + "Ela possui solicitações cadastradas "
+                        + "vinculadas a ela.\n"
+                        + "Para preservar o histórico das solicitações, "
+                        + "a instituição não pode ser excluída.",
+                        "Instituição vinculada",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
         }
     }//GEN-LAST:event_btnExcluirActionPerformed
 

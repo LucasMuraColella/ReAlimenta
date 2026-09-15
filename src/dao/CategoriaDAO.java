@@ -13,8 +13,7 @@ public class CategoriaDAO {
 
         String sql = "INSERT INTO categoria (nome, descricao) VALUES (?, ?)";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, categoria.getNome());
             stmt.setString(2, categoria.getDescricao());
@@ -32,9 +31,7 @@ public class CategoriaDAO {
 
         String sql = "SELECT * FROM categoria ORDER BY id_categoria";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
 
@@ -58,8 +55,7 @@ public class CategoriaDAO {
 
         String sql = "SELECT * FROM categoria WHERE id_categoria = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
@@ -86,10 +82,9 @@ public class CategoriaDAO {
     public void atualizar(Categoria categoria) {
 
         String sql = "UPDATE categoria SET nome = ?, descricao = ? "
-                   + "WHERE id_categoria = ?";
+                + "WHERE id_categoria = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, categoria.getNome());
             stmt.setString(2, categoria.getDescricao());
@@ -102,18 +97,28 @@ public class CategoriaDAO {
         }
     }
 
-    public void excluir(int id) {
+    public boolean excluir(int id) {
 
         String sql = "DELETE FROM categoria WHERE id_categoria = ?";
 
-        try (Connection conexao = Conexao.conectar();
-             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try (Connection conexao = Conexao.conectar(); PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
+
             stmt.executeUpdate();
 
+            return true;
+
         } catch (SQLException e) {
+
+            // Violação de chave estrangeira
+            if ("23503".equals(e.getSQLState())) {
+                return false;
+            }
+
             e.printStackTrace();
         }
+
+        return false;
     }
 }

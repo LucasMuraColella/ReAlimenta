@@ -364,7 +364,15 @@ public class TelaAlimento extends javax.swing.JFrame {
             new String [] {
                 "ID", "Nome", "Quantidade", "Unidade", "Validade", "Categoria", "Doador", "Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableAlimentos.setGridColor(new java.awt.Color(224, 224, 224));
         tableAlimentos.setInheritsPopupMenu(true);
         tableAlimentos.setIntercellSpacing(new java.awt.Dimension(0, 1));
@@ -926,17 +934,36 @@ public class TelaAlimento extends javax.swing.JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
 
-            alimentoDAO.excluir(
-                    id_alimento_selecionado
-            );
+            boolean excluiu
+                    = alimentoDAO.excluir(
+                            id_alimento_selecionado
+                    );
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Alimento excluído com sucesso!"
-            );
+            if (excluiu) {
 
-            limparCampos();
-            carregarTabela();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Alimento excluído com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                limparCampos();
+                carregarTabela();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Não é possível excluir este alimento.\n\n"
+                        + "Ele está vinculado a uma ou mais "
+                        + "solicitações cadastradas no sistema.\n"
+                        + "Para preservar o histórico das solicitações, "
+                        + "o alimento não pode ser excluído.",
+                        "Alimento vinculado",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
         }
     }//GEN-LAST:event_btnExcluirActionPerformed
 

@@ -159,7 +159,15 @@ public class TelaCategoria extends javax.swing.JFrame {
             new String [] {
                 "ID", "Nome", "Descrição"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableCategorias.setGridColor(new java.awt.Color(224, 224, 224));
         tableCategorias.setIntercellSpacing(new java.awt.Dimension(0, 1));
         tableCategorias.setRowHeight(28);
@@ -355,8 +363,12 @@ public class TelaCategoria extends javax.swing.JFrame {
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
         if (idCategoriaSelecionada == 0) {
-            JOptionPane.showMessageDialog(this,
-                    "Selecione uma categoria na tabela.");
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Selecione uma categoria na tabela."
+            );
+
             return;
         }
 
@@ -369,14 +381,37 @@ public class TelaCategoria extends javax.swing.JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
 
-            categoriaDAO.excluir(idCategoriaSelecionada);
+            boolean excluiu
+                    = categoriaDAO.excluir(
+                            idCategoriaSelecionada
+                    );
 
-            JOptionPane.showMessageDialog(this,
-                    "Categoria excluída com sucesso!");
+            if (excluiu) {
 
-            limparCampos();
-            idCategoriaSelecionada = 0;
-            carregarTabela();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Categoria excluída com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                limparCampos();
+                idCategoriaSelecionada = 0;
+                carregarTabela();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Não é possível excluir esta categoria.\n\n"
+                        + "Ela possui alimentos cadastrados "
+                        + "vinculados a ela.\n"
+                        + "Altere ou exclua os alimentos relacionados "
+                        + "antes de excluir a categoria.",
+                        "Categoria vinculada",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
         }
     }//GEN-LAST:event_btnExcluirActionPerformed
 

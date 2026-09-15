@@ -467,14 +467,14 @@
             </Property>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
               <Table columnCount="8" rowCount="4">
-                <Column editable="true" title="ID" type="java.lang.Object"/>
-                <Column editable="true" title="Institui&#xe7;&#xe3;o" type="java.lang.Object"/>
-                <Column editable="true" title="CNPJ" type="java.lang.Object"/>
-                <Column editable="true" title="Respons&#xe1;vel" type="java.lang.Object"/>
-                <Column editable="true" title="CEP" type="java.lang.Object"/>
-                <Column editable="true" title="Rua" type="java.lang.Object"/>
-                <Column editable="true" title="N&#xfa;mero" type="java.lang.Object"/>
-                <Column editable="true" title="Bairro" type="java.lang.Object"/>
+                <Column editable="false" title="ID" type="java.lang.Object"/>
+                <Column editable="false" title="Institui&#xe7;&#xe3;o" type="java.lang.Object"/>
+                <Column editable="false" title="CNPJ" type="java.lang.Object"/>
+                <Column editable="false" title="Respons&#xe1;vel" type="java.lang.Object"/>
+                <Column editable="false" title="CEP" type="java.lang.Object"/>
+                <Column editable="false" title="Rua" type="java.lang.Object"/>
+                <Column editable="false" title="N&#xfa;mero" type="java.lang.Object"/>
+                <Column editable="false" title="Bairro" type="java.lang.Object"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">

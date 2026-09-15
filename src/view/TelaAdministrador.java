@@ -6,6 +6,7 @@ import model.Administrador;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.table.DefaultTableModel;
 
 import util.SenhaUtil;
@@ -20,6 +21,8 @@ public class TelaAdministrador extends javax.swing.JFrame {
 
     private int id_admin_selecionado = 0;
 
+    private Administrador administradorLogado;
+
     public TelaAdministrador() {
         initComponents();
 
@@ -30,6 +33,15 @@ public class TelaAdministrador extends javax.swing.JFrame {
         setLocationRelativeTo(null);
 
         carregarTabela();
+    }
+
+    public TelaAdministrador(
+            Administrador administradorLogado) {
+
+        this();
+
+        this.administradorLogado
+                = administradorLogado;
     }
 
     private void carregarTabela() {
@@ -73,6 +85,76 @@ public class TelaAdministrador extends javax.swing.JFrame {
         tableAdministradores.clearSelection();
 
         txtNome.requestFocus();
+    }
+
+    private boolean confirmarSenhaAtual() {
+
+        if (administradorLogado == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Não foi possível identificar o administrador logado.",
+                    "Erro de segurança",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return false;
+        }
+
+        javax.swing.JPasswordField campoSenha
+                = new javax.swing.JPasswordField();
+
+        campoSenha.setEchoChar('•');
+
+        int resposta
+                = JOptionPane.showConfirmDialog(
+                        this,
+                        campoSenha,
+                        "Digite sua senha atual:",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+        if (resposta != JOptionPane.OK_OPTION) {
+            return false;
+        }
+
+        String senhaDigitada
+                = new String(
+                        campoSenha.getPassword()
+                );
+
+        if (senhaDigitada.trim().isEmpty()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Digite sua senha atual.",
+                    "Atenção",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return false;
+        }
+
+        boolean senhaCorreta
+                = SenhaUtil.verificarSenha(
+                        senhaDigitada,
+                        administradorLogado.getSenha()
+                );
+
+        if (!senhaCorreta) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Senha incorreta. Operação cancelada.",
+                    "Acesso negado",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -212,7 +294,15 @@ public class TelaAdministrador extends javax.swing.JFrame {
             new String [] {
                 "ID", "Nome", "E-mail", "Telefone", "Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableAdministradores.setGridColor(new java.awt.Color(224, 224, 224));
         tableAdministradores.setIntercellSpacing(new java.awt.Dimension(0, 1));
         tableAdministradores.setRowHeight(28);
@@ -240,20 +330,10 @@ public class TelaAdministrador extends javax.swing.JFrame {
             .addComponent(jSeparator2)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 458, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
-            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 555, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(173, 173, 173)
-                        .addComponent(lblTitulo2, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(25, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 458, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -269,16 +349,25 @@ public class TelaAdministrador extends javax.swing.JFrame {
                                 .addComponent(txtSenha)
                                 .addComponent(txtTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(120, 120, 120))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(127, 127, 127))))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 555, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(173, 173, 173)
+                        .addComponent(lblTitulo2, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(102, 102, 102)
                         .addComponent(btnCadastrar)
                         .addGap(18, 18, 18)
                         .addComponent(btnAlterar)
                         .addGap(18, 18, 18)
                         .addComponent(btnExcluir)
                         .addGap(18, 18, 18)
-                        .addComponent(btnLimpar)
-                        .addGap(105, 105, 105))))
+                        .addComponent(btnLimpar)))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -307,7 +396,7 @@ public class TelaAdministrador extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblStatus)
                     .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(28, 28, 28)
+                .addGap(27, 27, 27)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCadastrar)
                     .addComponent(btnAlterar)
@@ -319,7 +408,7 @@ public class TelaAdministrador extends javax.swing.JFrame {
                 .addComponent(lblTitulo2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         txtTelefone.getAccessibleContext().setAccessibleDescription("");
@@ -348,7 +437,7 @@ public class TelaAdministrador extends javax.swing.JFrame {
         String email
                 = txtEmail.getText().trim();
 
-        String senha
+        String novaSenha
                 = new String(
                         txtSenha.getPassword()
                 );
@@ -360,27 +449,63 @@ public class TelaAdministrador extends javax.swing.JFrame {
 
         if (nome.isEmpty()
                 || email.isEmpty()
-                || senha.isEmpty()
                 || telefone.isEmpty()) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Preencha todos os campos."
+                    "Preencha todos os campos obrigatórios."
             );
 
             return;
         }
 
-        Administrador administrador
-                = new Administrador();
+        if (!ValidadorUtil.emailValido(email)) {
 
-        administrador.setId_adm(
-                id_admin_selecionado
-        );
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Informe um e-mail válido."
+            );
+
+            return;
+        }
+
+        if (telefone.length() < 10) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Informe um telefone válido."
+            );
+
+            return;
+        }
+
+        /*
+     * Confirma a senha do administrador logado
+     * antes de realizar a alteração.
+         */
+        if (!confirmarSenhaAtual()) {
+            return;
+        }
+
+        Administrador administrador
+                = administradorDAO.buscarPorId(
+                        id_admin_selecionado
+                );
+
+        if (administrador == null) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Administrador não encontrado.",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
 
         administrador.setNome(nome);
         administrador.setEmail(email);
-        administrador.setSenha(senha);
         administrador.setTelefone(telefone);
 
         administrador.setStatus(
@@ -391,13 +516,68 @@ public class TelaAdministrador extends javax.swing.JFrame {
                 )
         );
 
-        administradorDAO.atualizar(
-                administrador
-        );
+        /*
+     * O campo senha é opcional na alteração.
+     *
+     * Preenchido:
+     * → altera a senha e gera novo hash.
+     *
+     * Vazio:
+     * → mantém a senha atual.
+         */
+        if (!novaSenha.trim().isEmpty()) {
+
+            if (novaSenha.length() < 6) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "A nova senha deve possuir pelo menos 6 caracteres.",
+                        "Senha inválida",
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                return;
+            }
+
+            String novoHash
+                    = SenhaUtil.gerarHash(
+                            novaSenha
+                    );
+
+            administrador.setSenha(novoHash);
+
+            administradorDAO.atualizar(
+                    administrador
+            );
+
+            /*
+         * Caso o administrador tenha alterado
+         * a própria senha, atualiza o objeto
+         * que está em memória.
+             */
+            if (administradorLogado != null
+                    && administrador.getId_adm()
+                    == administradorLogado.getId_adm()) {
+
+                administradorLogado.setSenha(novoHash);
+            }
+
+        } else {
+
+            /*
+         * Altera somente os dados cadastrais
+         * e mantém a senha existente.
+             */
+            administradorDAO.atualizarSemAlterarSenha(
+                    administrador
+            );
+        }
 
         JOptionPane.showMessageDialog(
                 this,
-                "Administrador alterado com sucesso!"
+                "Administrador alterado com sucesso!",
+                "Sucesso",
+                JOptionPane.INFORMATION_MESSAGE
         );
 
         limparCampos();
@@ -553,29 +733,74 @@ public class TelaAdministrador extends javax.swing.JFrame {
             return;
         }
 
+        /*
+     * Não permite que o administrador logado
+     * exclua a própria conta.
+         */
+        if (administradorLogado != null
+                && id_admin_selecionado
+                == administradorLogado.getId_adm()) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "O administrador logado não pode excluir a própria conta.",
+                    "Operação não permitida",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            return;
+        }
+
+        /*
+     * Confirma a senha do administrador logado.
+         */
+        if (!confirmarSenhaAtual()) {
+            return;
+        }
+
         int resposta
                 = JOptionPane.showConfirmDialog(
                         this,
                         "Deseja realmente excluir "
                         + "este administrador?",
-                        "Confirmação",
-                        JOptionPane.YES_NO_OPTION
+                        "Confirmar exclusão",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
                 );
 
-        if (resposta
-                == JOptionPane.YES_OPTION) {
+        if (resposta != JOptionPane.YES_OPTION) {
+            return;
+        }
 
-            administradorDAO.excluir(
-                    id_admin_selecionado
-            );
+        boolean excluiu
+                = administradorDAO.excluir(
+                        id_admin_selecionado
+                );
+
+        if (excluiu) {
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Administrador excluído com sucesso!"
+                    "Administrador excluído com sucesso!",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE
             );
 
             limparCampos();
             carregarTabela();
+
+        } else {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Não é possível excluir este administrador.\n\n"
+                    + "Ele está vinculado a uma ou mais "
+                    + "solicitações cadastradas no sistema.\n"
+                    + "Para preservar o histórico das solicitações, "
+                    + "o administrador não pode ser excluído.",
+                    "Administrador vinculado",
+                    JOptionPane.WARNING_MESSAGE
+            );
         }
     }//GEN-LAST:event_btnExcluirActionPerformed
 

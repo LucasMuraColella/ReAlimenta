@@ -240,7 +240,15 @@ public class TelaAprovacaoSolicitacao extends javax.swing.JFrame {
             new String [] {
                 "ID", "Instituição", "Data", "Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableSolicitacoes.setGridColor(new java.awt.Color(224, 224, 224));
         tableSolicitacoes.setInheritsPopupMenu(true);
         tableSolicitacoes.setIntercellSpacing(new java.awt.Dimension(0, 1));
@@ -271,7 +279,15 @@ public class TelaAprovacaoSolicitacao extends javax.swing.JFrame {
             new String [] {
                 "Alimento", "Solicitado", "Unidade", "Disponível"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableItens.setGridColor(new java.awt.Color(224, 224, 224));
         tableItens.setInheritsPopupMenu(true);
         tableItens.setIntercellSpacing(new java.awt.Dimension(0, 1));

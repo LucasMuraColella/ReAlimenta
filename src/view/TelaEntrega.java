@@ -1,8 +1,12 @@
 package view;
 
 import dao.EntregaDAO;
+import dao.ItemSolicitacaoDAO;
+import dao.AlimentoDAO;
 
 import model.Entrega;
+import model.Alimento;
+import model.ItemSolicitacao;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +22,12 @@ public class TelaEntrega extends javax.swing.JFrame {
     private EntregaDAO entregaDAO
             = new EntregaDAO();
 
+    private ItemSolicitacaoDAO itemSolicitacaoDAO
+            = new ItemSolicitacaoDAO();
+
+    private AlimentoDAO alimentoDAO
+            = new AlimentoDAO();
+
     private int id_entrega_selecionada = 0;
 
     private final DateTimeFormatter formato_data
@@ -31,6 +41,57 @@ public class TelaEntrega extends javax.swing.JFrame {
 
         carregarSolicitacoes();
         carregarTabela();
+    }
+
+    private void carregarItensDaSolicitacao(
+            int fk_solicitacao) {
+
+        DefaultTableModel modelo
+                = (DefaultTableModel) tableItens.getModel();
+
+        modelo.setRowCount(0);
+
+        if (fk_solicitacao == 0) {
+            return;
+        }
+
+        List<ItemSolicitacao> itens
+                = itemSolicitacaoDAO
+                        .listarPorSolicitacao(
+                                fk_solicitacao
+                        );
+
+        List<Alimento> alimentos
+                = alimentoDAO.listar();
+
+        for (ItemSolicitacao item
+                : itens) {
+
+            String nome_alimento = "";
+            String unidade_medida = "";
+
+            for (Alimento alimento
+                    : alimentos) {
+
+                if (alimento.getId_alimento()
+                        == item.getFk_alimento()) {
+
+                    nome_alimento
+                            = alimento.getNome();
+
+                    unidade_medida
+                            = alimento.getUnidade_medida();
+
+                    break;
+                }
+            }
+
+            modelo.addRow(new Object[]{
+                nome_alimento,
+                item.getQuantidade_solicitada(),
+                unidade_medida
+            });
+        }
     }
 
     private void carregarSolicitacoes() {
@@ -102,9 +163,16 @@ public class TelaEntrega extends javax.swing.JFrame {
 
         tableEntregas.clearSelection();
 
+        DefaultTableModel modelo
+                = (DefaultTableModel) tableItens.getModel();
+
+        modelo.setRowCount(0);
+
         if (cbSolicitacao.getItemCount() > 0) {
             cbSolicitacao.setSelectedIndex(0);
         }
+
+        cbSolicitacao.setEnabled(true);
 
         if (cbStatus.getItemCount() > 0) {
             cbStatus.setSelectedItem(
@@ -145,6 +213,9 @@ public class TelaEntrega extends javax.swing.JFrame {
         lblTitulo2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tableEntregas = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tableItens = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setBackground(new java.awt.Color(245, 247, 245));
@@ -260,9 +331,18 @@ public class TelaEntrega extends javax.swing.JFrame {
             new String [] {
                 "ID", "Solicitação", "Data", "Responsável", "Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableEntregas.setGridColor(new java.awt.Color(224, 224, 224));
         tableEntregas.setIntercellSpacing(new java.awt.Dimension(0, 1));
+        tableEntregas.setRowHeight(28);
         tableEntregas.setSelectionBackground(new java.awt.Color(232, 245, 233));
         tableEntregas.setSelectionForeground(new java.awt.Color(38, 50, 56));
         tableEntregas.setShowGrid(true);
@@ -274,62 +354,107 @@ public class TelaEntrega extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tableEntregas);
         if (tableEntregas.getColumnModel().getColumnCount() > 0) {
             tableEntregas.getColumnModel().getColumn(0).setPreferredWidth(10);
-            tableEntregas.getColumnModel().getColumn(2).setPreferredWidth(30);
+            tableEntregas.getColumnModel().getColumn(1).setPreferredWidth(35);
+            tableEntregas.getColumnModel().getColumn(2).setPreferredWidth(20);
         }
+
+        tableItens.setFont(new java.awt.Font("Arial", 0, 13)); // NOI18N
+        tableItens.setForeground(new java.awt.Color(38, 50, 56));
+        tableItens.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Alimento", "Quantidade", "Unidade"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tableItens.setGridColor(new java.awt.Color(224, 224, 224));
+        tableItens.setIntercellSpacing(new java.awt.Dimension(0, 1));
+        tableItens.setRowHeight(28);
+        tableItens.setSelectionBackground(new java.awt.Color(232, 245, 233));
+        tableItens.setSelectionForeground(new java.awt.Color(38, 50, 56));
+        tableItens.setShowGrid(true);
+        tableItens.setShowHorizontalLines(true);
+        tableItens.setShowVerticalLines(true);
+        jScrollPane3.setViewportView(tableItens);
+
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(96, 125, 139));
+        jLabel1.setText("Itens da Solicitação:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblSolicitacao, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbSolicitacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblDataEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtDataEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblResponsavelEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtResponsavelEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jScrollPane1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 593, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(122, 122, 122)
-                        .addComponent(btnCadastrar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnAlterar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnExcluir)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnLimpar)))
-                .addContainerGap(23, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(140, 140, 140))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblSolicitacao)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbSolicitacao, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(lblTitulo2, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(127, 127, 127))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(140, 140, 140))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(24, 24, 24)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblDataEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtDataEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblResponsavelEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtResponsavelEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 593, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(122, 122, 122)
+                                .addComponent(btnCadastrar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnAlterar)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnExcluir)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnLimpar)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -343,6 +468,10 @@ public class TelaEntrega extends javax.swing.JFrame {
                     .addComponent(lblSolicitacao)
                     .addComponent(cbSolicitacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDataEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDataEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -373,7 +502,7 @@ public class TelaEntrega extends javax.swing.JFrame {
                 .addComponent(lblTitulo2)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 288, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         pack();
@@ -530,6 +659,12 @@ public class TelaEntrega extends javax.swing.JFrame {
         cbSolicitacao.setSelectedItem(
                 solicitacao
         );
+
+        cbSolicitacao.setEnabled(false);
+
+        carregarItensDaSolicitacao(
+                entrega.getFk_solicitacao()
+        );
     }//GEN-LAST:event_tableEntregasMouseClicked
 
     private void btnAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarActionPerformed
@@ -683,7 +818,12 @@ public class TelaEntrega extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void cbSolicitacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSolicitacaoActionPerformed
-        // TODO add your handling code here:
+        int fk_solicitacao
+                = obterIdSolicitacaoSelecionada();
+
+        carregarItensDaSolicitacao(
+                fk_solicitacao
+        );
     }//GEN-LAST:event_cbSolicitacaoActionPerformed
 
     /**
@@ -718,8 +858,10 @@ public class TelaEntrega extends javax.swing.JFrame {
     private javax.swing.JButton btnLimpar;
     private javax.swing.JComboBox<String> cbSolicitacao;
     private javax.swing.JComboBox<String> cbStatus;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lblDataEntrega;
@@ -730,6 +872,7 @@ public class TelaEntrega extends javax.swing.JFrame {
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JLabel lblTitulo2;
     private javax.swing.JTable tableEntregas;
+    private javax.swing.JTable tableItens;
     private javax.swing.JTextField txtDataEntrega;
     private javax.swing.JTextArea txtObservacao;
     private javax.swing.JTextField txtResponsavelEntrega;

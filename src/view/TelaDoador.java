@@ -253,7 +253,15 @@ public class TelaDoador extends javax.swing.JFrame {
             new String [] {
                 "ID", "Nome", "CPF/CNPJ", "Telefone", "CEP", "Rua", "Número", "Bairro"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tableDoadores.setGridColor(new java.awt.Color(224, 224, 224));
         tableDoadores.setIntercellSpacing(new java.awt.Dimension(0, 1));
         tableDoadores.setRowHeight(28);
@@ -567,8 +575,10 @@ public class TelaDoador extends javax.swing.JFrame {
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
         if (idDoadorSelecionado == 0) {
 
-            JOptionPane.showMessageDialog(this,
-                    "Selecione um doador na tabela.");
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Selecione um doador na tabela."
+            );
 
             return;
         }
@@ -582,13 +592,36 @@ public class TelaDoador extends javax.swing.JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
 
-            doadorDAO.excluir(idDoadorSelecionado);
+            boolean excluiu
+                    = doadorDAO.excluir(
+                            idDoadorSelecionado
+                    );
 
-            JOptionPane.showMessageDialog(this,
-                    "Doador excluído com sucesso!");
+            if (excluiu) {
 
-            limparCampos();
-            carregarTabela();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Doador excluído com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+
+                limparCampos();
+                carregarTabela();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Não é possível excluir este doador.\n\n"
+                        + "Ele possui alimentos cadastrados "
+                        + "vinculados a ele.\n"
+                        + "Altere ou exclua os alimentos relacionados "
+                        + "antes de excluir o doador.",
+                        "Doador vinculado",
+                        JOptionPane.WARNING_MESSAGE
+                );
+            }
         }
     }//GEN-LAST:event_btnExcluirActionPerformed
 
