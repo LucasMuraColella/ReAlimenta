@@ -50,7 +50,7 @@
                               <Component id="lblCep" min="-2" pref="37" max="-2" attributes="0"/>
                               <EmptySpace min="63" pref="63" max="-2" attributes="0"/>
                               <Component id="txtCep" min="-2" pref="151" max="-2" attributes="0"/>
-                              <EmptySpace min="19" pref="19" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="btnBuscarCep" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -135,10 +135,12 @@
               <EmptySpace min="18" pref="18" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lblCep" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtCep" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnBuscarCep" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="txtCep" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnBuscarCep" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace min="17" pref="17" max="-2" attributes="0"/>
+              <EmptySpace min="16" pref="16" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lblRua" min="-2" max="-2" attributes="0"/>
                   <Component id="txtRua" min="-2" max="-2" attributes="0"/>
